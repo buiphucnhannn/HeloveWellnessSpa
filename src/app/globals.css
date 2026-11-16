@@ -1,0 +1,403 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * Design tokens — Helove Wellness Spa · "Wellness Luxury"
+ * Nâu chocolate · vàng đồng · kem (đồng bộ logo). Serif Cormorant nghiêng làm điểm nhấn.
+ * ------------------------------------------------------------------------- */
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
+
+  --color-cream: #f8f1e7;
+  --color-cream-100: #f1e6d6;
+  --color-cream-200: #e6d5bf;
+  --color-sand: #ead9c2;
+
+  --color-cocoa: #4a2c1b;
+  --color-cocoa-deep: #24150d;
+  --color-cocoa-900: #1a0f09;
+
+  --color-gold: #d6b16e;
+  --color-gold-soft: #f1e2c3;
+
+  --color-accent: #a8733f;
+  --color-accent-deep: #85552a;
+  --color-accent-soft: #f2e4d0;
+
+  --color-ink: #2a1b12;
+  --color-ink-soft: #5f4b3d;
+  --color-ink-muted: #8f7a69;
+  --color-line: #e5d4bd;
+
+  --shadow-soft: 0 24px 60px -24px rgb(36 21 13 / 0.35);
+  --shadow-card: 0 10px 30px -12px rgb(36 21 13 / 0.22);
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-pulse-ring: ripple 3s ease-out infinite;
+  --animate-kenburns: kenburns 16s ease-out forwards;
+  --animate-spin-slow: spinSlow 28s linear infinite;
+  --animate-shine: shine 6s ease-in-out infinite;
+
+  @keyframes spinSlow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    70%,
+    100% {
+      transform: scale(1.9);
+      opacity: 0;
+    }
+  }
+  @keyframes kenburns {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.07);
+    }
+  }
+  @keyframes shine {
+    0%,
+    60% {
+      transform: translateX(-120%) skewX(-18deg);
+    }
+    100% {
+      transform: translateX(220%) skewX(-18deg);
+    }
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+body {
+  @apply bg-cocoa-deep font-sans text-ink antialiased;
+}
+::selection {
+  background: var(--color-gold-soft);
+  color: var(--color-cocoa-deep);
+}
+img {
+  -webkit-user-drag: none;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Utilities ---------- */
+@utility h-display {
+  @apply font-display leading-[1.02] font-medium tracking-[-0.01em] text-ink;
+}
+/* nhãn nhỏ viết hoa có gạch vàng đứng trước */
+@utility label {
+  @apply text-[11px] font-medium tracking-[0.24em] text-ink-muted uppercase;
+}
+@utility chip {
+  @apply inline-flex items-center rounded-full bg-cream/95 px-3 py-1.5 text-[12px] font-medium text-ink shadow-[0_2px_10px_rgba(36,21,13,0.1)];
+}
+@utility field-box {
+  @apply w-full rounded-xl border border-cocoa/12 bg-white px-4 py-3 text-sm text-ink transition outline-none placeholder:text-ink-muted focus:border-accent/60 focus:ring-2 focus:ring-accent/15;
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+@utility text-legible {
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.4),
+    0 2px 14px rgb(0 0 0 / 0.3);
+}
+/* chữ ánh kim (vàng đồng) cho số liệu / điểm nhấn trên nền tối */
+@utility text-gilded {
+  background: linear-gradient(100deg, #b98a4a 0%, #f3d79a 45%, #c99a58 70%, #f0d090 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* text-shadow xuyên qua chữ trong suốt làm đục màu → tắt, dùng drop-shadow thay thế */
+  text-shadow: none;
+  filter: drop-shadow(0 1px 8px rgb(26 15 9 / 0.35));
+}
+@utility logo-glow {
+  filter: drop-shadow(0 2px 10px rgb(26 15 9 / 0.55));
+}
+/* "một màn hình" cho section nội dung (chỉ từ lg) */
+@utility screen {
+  @media (min-width: 1024px) {
+    min-height: min(100svh, 1080px);
+  }
+}
+@utility min-h-screen-cap {
+  min-height: max(600px, min(100svh, 1080px));
+}
+
+/* ---------- Reveal (trạng thái ẩn; useReveal chạy animation bằng WAAPI) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  filter: blur(6px);
+  will-change: opacity, transform, filter;
+}
+.reveal[data-reveal="left"] {
+  transform: translateX(-32px);
+}
+.reveal[data-reveal="right"] {
+  transform: translateX(32px);
+}
+.reveal[data-reveal="scale"] {
+  transform: scale(0.94);
+}
+.reveal[data-reveal="wipe"],
+.reveal[data-reveal="arch"],
+.reveal[data-reveal="circle"] {
+  opacity: 0;
+  transform: none;
+  filter: none;
+}
+.reveal[data-reveal="none"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.split .split-unit {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(0.35em);
+}
+
+/* Nội dung banner đầu trang: hiện lần lượt sau màn chào (html.is-ready do Preloader gắn). --d: độ trễ. */
+.intro {
+  opacity: 0;
+}
+html.is-ready .intro {
+  animation: introIn 1s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+}
+@keyframes introIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes logoIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+@keyframes glowIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes lineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes marqueeX {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes scrollCue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+@keyframes quoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeX var(--marquee-duration, 50s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 10px;
+  border: 2px solid var(--color-cream-100);
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream-100);
+}
+
+.font-display,
+.h-display {
+  font-variant-numeric: lining-nums;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  .h-display,
+  figcaption {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote,
+  dd {
+    text-wrap: pretty;
+  }
+  button:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  summary,
+  select,
+  input[type="date"],
+  [data-booking] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* ---------- Khung trang tối đa 1920px khi zoom nhỏ / màn rất rộng ---------- */
+:root {
+  --page-max: 1920px;
+  --page-gutter: max(0px, calc((100vw - var(--page-max)) / 2));
+}
+@utility page-frame {
+  margin-inline: auto;
+  max-width: var(--page-max);
+}
+@utility edge-right {
+  right: calc(var(--page-gutter) + 1rem);
+}
+@utility edge-left {
+  left: calc(var(--page-gutter) + 1rem);
+}
+
+/* ---------- Chuyển trang (PageTransition) ---------- */
+main {
+  transition:
+    opacity 0.2s var(--ease-out-expo),
+    transform 0.2s var(--ease-out-expo);
+}
+main.page-leave {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+main.page-enter {
+  animation: pageIn 0.5s var(--ease-out-expo) both;
+}
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
